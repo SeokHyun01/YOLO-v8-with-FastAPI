@@ -15,12 +15,10 @@ model = YOLO("yolov8l.pt")
 
 
 class EventHeader(BaseModel):
-    UserId: str
-    CameraId: int
     Created: str
     Path: str
     IsRequiredObjectDetection: bool
-
+    CameraId: int
 
 class EventBody(BaseModel):
     Label: int
@@ -37,7 +35,6 @@ class Event(BaseModel):
 
 @router.post('/create', status_code=status.HTTP_200_OK)
 def create_event(header: EventHeader, response: Response):
-    user_id = header.UserId
     camera_id = header.CameraId
     created = header.Created
     path = header.Path
@@ -70,7 +67,6 @@ def create_event(header: EventHeader, response: Response):
 
     send_event = Event(
         EventHeader = {
-            'UserId': user_id,
             'CameraId': camera_id,
             'Created': created,
             'Path': path,
