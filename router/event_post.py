@@ -43,13 +43,13 @@ def create_event(header: EventHeader, response: Response):
         image = Image.open(path)
     except FileNotFoundError:
         response.status_code = status.HTTP_404_NOT_FOUND
-        return {'Error': 'File not found.'}
+        return {'ErrorMessage': 'File not found.'}
 
     try:
         results = model.predict(image)
     except Exception as exception:
         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
-        return {'Error': str(exception)}
+        return {'ErrorMessage': str(exception)}
 
     image.close()
 
