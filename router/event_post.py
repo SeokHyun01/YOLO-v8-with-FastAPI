@@ -11,7 +11,7 @@ router = APIRouter(
     tags=['event']
 )
 
-model = YOLO("detect-fire.pt")
+model = YOLO("yolov8l.pt")
 
 
 class EventHeader(BaseModel):
@@ -21,7 +21,7 @@ class EventHeader(BaseModel):
     CameraId: int
 
 class EventBody(BaseModel):
-    Label: str
+    Label: int
     Left: int
     Top: int
     Right: int
@@ -58,7 +58,7 @@ def create_event(header: EventHeader, response: Response):
         for bbox, cls in zip(result.boxes.xyxy, result.boxes.cls):
             left, top, right, bottom = bbox.tolist()
             event_bodies.append({
-                'Label': "fire" if cls.item() == 0 else "smoke",
+                'Label': int(cls.item()),
                 'Left': left,
                 'Top': top,
                 'Right': right,
