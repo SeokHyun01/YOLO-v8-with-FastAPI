@@ -11,7 +11,7 @@ router = APIRouter(
     tags=['event']
 )
 
-model = YOLO("yolov8l.pt")
+model = YOLO("detect-fire.pt")
 
 
 class EventHeader(BaseModel):
