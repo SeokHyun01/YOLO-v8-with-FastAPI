@@ -58,7 +58,7 @@ def create_event(header: EventHeader, response: Response):
         for bbox, cls in zip(result.boxes.xyxy, result.boxes.cls):
             left, top, right, bottom = bbox.tolist()
             event_bodies.append({
-                'Label': str(cls.item()),
+                'Label': int(cls.item()),
                 'Left': left,
                 'Top': top,
                 'Right': right,
