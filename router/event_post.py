@@ -21,7 +21,7 @@ class EventHeader(BaseModel):
     CameraId: int
 
 class EventBody(BaseModel):
-    Label: int
+    Label: str
     Left: int
     Top: int
     Right: int
@@ -58,7 +58,7 @@ def create_event(header: EventHeader, response: Response):
         for bbox, cls in zip(result.boxes.xyxy, result.boxes.cls):
             left, top, right, bottom = bbox.tolist()
             event_bodies.append({
-                'Label': int(cls.item()),
+                'Label': str(cls.item()),
                 'Left': left,
                 'Top': top,
                 'Right': right,
