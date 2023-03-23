@@ -21,7 +21,7 @@ class EventHeader(BaseModel):
     CameraId: int
 
 class EventBody(BaseModel):
-    Label: int
+    Label: str
     Left: int
     Top: int
     Right: int
