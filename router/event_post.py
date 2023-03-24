@@ -33,7 +33,7 @@ class PredictionResults(BaseModel):
 @router.post('/create', status_code=status.HTTP_200_OK)
 def create_event(request_data: ObjectDetectionRequest, response: Response):
     try:
-        image = Image.open(request_data.path)
+        image = Image.open(request_data.Path)
     except FileNotFoundError:
         response.status_code = status.HTTP_404_NOT_FOUND
         return {'ErrorMessage': 'File not found.'}
