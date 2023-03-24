@@ -14,6 +14,10 @@ router = APIRouter(
 model = YOLO("detect-fire.pt")
 
 
+class ObjectDetectionRequest(BaseModel):
+    path: str
+
+
 class PredictionResult(BaseModel):
     Label: int
     Left: int
@@ -27,9 +31,9 @@ class PredictionResults(BaseModel):
 
 
 @router.post('/create', status_code=status.HTTP_200_OK)
-def create_event(path: str, response: Response):
+def create_event(request_data: ObjectDetectionRequest, response: Response):
     try:
-        image = Image.open(path)
+        image = Image.open(request_data.path)
     except FileNotFoundError:
         response.status_code = status.HTTP_404_NOT_FOUND
         return {'ErrorMessage': 'File not found.'}
