@@ -23,7 +23,7 @@ class PredictionResult(BaseModel):
     
     
 class PredictionResults(BaseModel):
-    results: Optional[List[PredictionResult]]
+    results: List[Optional[PredictionResult]]
 
 
 @router.post('/create', status_code=status.HTTP_200_OK)
