@@ -52,4 +52,4 @@ def create_event(request_data: ObjectDetectionRequest, response: Response):
             left, top, right, bottom = bbox.tolist()
             prediction_results.append(PredictionResult(Label=cls.item(), Left=left, Top=top, Right=right, Bottom=bottom))
 
-    return JSONResponse(content=PredictionResults(results=prediction_results))
+    return JSONResponse(content=PredictionResults(results=prediction_results).dict())
