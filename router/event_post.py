@@ -15,7 +15,7 @@ model = YOLO("detect-fire.pt")
 
 
 class ObjectDetectionRequest(BaseModel):
-    path: str
+    Path: str
 
 
 class PredictionResult(BaseModel):
