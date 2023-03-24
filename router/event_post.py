@@ -14,12 +14,16 @@ router = APIRouter(
 model = YOLO("detect-fire.pt")
 
 
-class EventBody(BaseModel):
+class PredictionResult(BaseModel):
     Label: int
     Left: int
     Top: int
     Right: int
     Bottom: int
+    
+    
+class PredictionResults(BaseModel):
+    results: Optional[List[PredictionResult]]
 
 
 @router.post('/create', status_code=status.HTTP_200_OK)
@@ -38,10 +42,10 @@ def create_event(path: str, response: Response):
 
     image.close()
 
-    event_bodies = []
+    prediction_results = []
     for result in results:
         for bbox, cls in zip(result.boxes.xyxy, result.boxes.cls):
             left, top, right, bottom = bbox.tolist()
-            event_bodies.append(EventBody(Label=cls.item(), Left=left, Top=top, Right=right, Bottom=bottom))
+            prediction_results.append(PredictionResult(Label=cls.item(), Left=left, Top=top, Right=right, Bottom=bottom))
 
-    return event_bodies
+    return PredictionResults(results=prediction_results)
