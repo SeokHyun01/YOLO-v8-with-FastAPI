@@ -11,34 +11,19 @@ router = APIRouter(
     tags=['event']
 )
 
-model = YOLO("yolov8l.pt")
+model = YOLO("detect-fire.pt")
 
-
-class EventHeader(BaseModel):
-    Created: str
-    Path: str
-    IsRequiredObjectDetection: bool
-    CameraId: int
 
 class EventBody(BaseModel):
-    Label: str
+    Label: int
     Left: int
     Top: int
     Right: int
     Bottom: int
 
 
-class Event(BaseModel):
-    EventHeader: EventHeader
-    EventBodies: Optional[List[EventBody]]
-
-
 @router.post('/create', status_code=status.HTTP_200_OK)
-def create_event(header: EventHeader, response: Response):
-    camera_id = header.CameraId
-    created = header.Created
-    path = header.Path
-
+def create_event(path: str, response: Response):
     try:
         image = Image.open(path)
     except FileNotFoundError:
@@ -57,22 +42,6 @@ def create_event(header: EventHeader, response: Response):
     for result in results:
         for bbox, cls in zip(result.boxes.xyxy, result.boxes.cls):
             left, top, right, bottom = bbox.tolist()
-            event_bodies.append({
-                'Label': int(cls.item()),
-                'Left': left,
-                'Top': top,
-                'Right': right,
-                'Bottom': bottom
-            })
+            event_bodies.append(EventBody(Label=cls.item(), Left=left, Top=top, Right=right, Bottom=bottom))
 
-    send_event = Event(
-        EventHeader = {
-            'CameraId': camera_id,
-            'Created': created,
-            'Path': path,
-            'IsRequiredObjectDetection': False
-        },
-        EventBodies = event_bodies
-    ).dict()
-
-    return JSONResponse(content=send_event)
+    return event_bodies
