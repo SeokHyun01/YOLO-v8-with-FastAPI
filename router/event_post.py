@@ -8,6 +8,8 @@ from PIL import Image
 import aiofiles
 from concurrent.futures import ThreadPoolExecutor
 import io
+import cv2
+import numpy as np
 
 
 router = APIRouter(
@@ -38,7 +40,8 @@ class PredictionResults(BaseModel):
 async def load_image_async(path: str):
     async with aiofiles.open(path, 'rb') as f:
         image_data = await f.read()
-    return Image.open(io.BytesIO(image_data))
+    np_array = np.frombuffer(image_data, dtype=np.uint8)
+    return cv2.imdecode(np_array, cv2.IMREAD_COLOR)
 
 def predict(image):
     return model.predict(image)
