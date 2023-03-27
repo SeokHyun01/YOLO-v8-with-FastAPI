@@ -7,6 +7,7 @@ from ultralytics import YOLO
 from PIL import Image
 import aiofiles
 from concurrent.futures import ThreadPoolExecutor
+import io
 
 
 router = APIRouter(
@@ -37,7 +38,7 @@ class PredictionResults(BaseModel):
 async def load_image_async(path: str):
     async with aiofiles.open(path, 'rb') as f:
         image_data = await f.read()
-    return Image.open(image_data)
+    return Image.open(io.BytesIO(image_data))
 
 def predict(image):
     return model.predict(image)
