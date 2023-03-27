@@ -61,8 +61,6 @@ async def create_event(request_data: ObjectDetectionRequest, response: Response)
         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
         return {'ErrorMessage': str(exception)}
 
-    image.close()
-
     prediction_results = []
     for result in results:
         for bbox, cls in zip(result.boxes.xyxy, result.boxes.cls):
