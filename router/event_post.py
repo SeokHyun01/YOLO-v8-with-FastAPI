@@ -1,9 +1,12 @@
+import asyncio
 from typing import Optional, List
 from fastapi import APIRouter, Response, status
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from ultralytics import YOLO
 from PIL import Image
+import aiofiles
+from concurrent.futures import ThreadPoolExecutor
 
 
 router = APIRouter(
@@ -12,6 +15,7 @@ router = APIRouter(
 )
 
 model = YOLO("detect-fire.pt")
+executor = ThreadPoolExecutor()
 
 
 class ObjectDetectionRequest(BaseModel):
@@ -27,19 +31,28 @@ class PredictionResult(BaseModel):
     
     
 class PredictionResults(BaseModel):
-    results: List[Optional[PredictionResult]]
+    Results: List[Optional[PredictionResult]]
 
+
+async def load_image_async(path: str):
+    async with aiofiles.open(path, 'rb') as f:
+        image_data = await f.read()
+    return Image.open(image_data)
+
+def predict(image):
+    return model.predict(image)
 
 @router.post('/create', status_code=status.HTTP_200_OK)
-def create_event(request_data: ObjectDetectionRequest, response: Response):
+async def create_event(request_data: ObjectDetectionRequest, response: Response):
     try:
-        image = Image.open(request_data.Path)
+        image = await load_image_async(request_data.Path)
     except FileNotFoundError:
         response.status_code = status.HTTP_404_NOT_FOUND
         return {'ErrorMessage': 'File not found.'}
 
     try:
-        results = model.predict(image)
+        loop = asyncio.get_running_loop()
+        results = await loop.run_in_executor(executor, predict, image)
     except Exception as exception:
         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
         return {'ErrorMessage': str(exception)}
@@ -52,4 +65,4 @@ def create_event(request_data: ObjectDetectionRequest, response: Response):
             left, top, right, bottom = bbox.tolist()
             prediction_results.append(PredictionResult(Label=cls.item(), Left=left, Top=top, Right=right, Bottom=bottom))
 
-    return PredictionResults(results=prediction_results)
+    return PredictionResults(Results=prediction_results)
