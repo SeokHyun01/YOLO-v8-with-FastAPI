@@ -17,7 +17,7 @@ router = APIRouter(
     tags=['event']
 )
 
-model = YOLO("detect-fire.pt")
+model = YOLO("yolov8l.pt")
 executor = ThreadPoolExecutor()
 
 
